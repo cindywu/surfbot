@@ -3,6 +3,13 @@ use serde_derive::Deserialize;
 #[derive(Deserialize, Debug)]
 pub struct APIResponse {
     data: Data,
+    associated: Associated,
+}
+
+#[derive(Deserialize, Debug)]
+#[serde(rename_all = "camelCase")]
+pub struct Associated {
+    utc_offset: i128,
 }
 
 #[derive(Deserialize, Debug)]

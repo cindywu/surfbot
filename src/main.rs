@@ -16,6 +16,10 @@ use types::APIResponse;
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let json = fetch_wave("5842041f4e65fad6a7708b39").await?;
+    // let fake_json = fetch_fake_wave().await?;
+
+    println!("{:#?}", json);
+    // println!("{:#?}", fake_json);
 
     let current_timestamp = SystemTime::now()
         .duration_since(UNIX_EPOCH)
@@ -43,7 +47,7 @@ fn test_faker_loads() -> Result<(), serde_json::Error> {
     Ok(())
 }
 
-async fn fetch_document(url: String) -> Result<reqwest::Response, Box<dyn std::error::Error>> {
+async fn get(url: String) -> Result<reqwest::Response, Box<dyn std::error::Error>> {
     let response = reqwest::get(&url).await?;
 
     println!("GET {}!", url);
@@ -51,10 +55,15 @@ async fn fetch_document(url: String) -> Result<reqwest::Response, Box<dyn std::e
         println!("URL: {:#?}, status: {:#?}", &url, response.status());
     } else {
         println!("Something bad happened...");
-        return Err(Box::new(response.status()));
+        // return Err(Box::new(response.status()));
     }
 
     Ok(response)
+}
+
+async fn fetch_fake_wave() -> Result<APIResponse, Box<dyn std::error::Error>> {
+    let p: APIResponse = serde_json::from_str(&faker::fake_response()).unwrap();
+    Ok(p)
 }
 
 async fn fetch_wave(spot_id: &str) -> Result<APIResponse, Box<dyn std::error::Error>> {
@@ -63,14 +72,9 @@ async fn fetch_wave(spot_id: &str) -> Result<APIResponse, Box<dyn std::error::Er
     params = format!("spotId={}", &spot_id)
     );
 
-    let resp = fetch_document(req_url.to_string()).await?;
-    let text = &resp.text().await?;
-
-    // let text = faker::fake_response();
+    let text = get(req_url.to_string()).await?.text().await?;
     let json = serde_json::from_str(&text);
 
     let p: APIResponse = json.unwrap();
-    println!("JSON: {:#?}", p);
-
     Ok(p)
 }

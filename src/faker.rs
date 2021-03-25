@@ -1,7 +1,6 @@
 pub fn fake_response() -> String {
     let response = r#"
     {
-      "dog": "hi",
       "associated": {
         "units": {
           "temperature": "F",
